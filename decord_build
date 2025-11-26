@@ -1,0 +1,23 @@
+# Prepare files
+git clone --recursive https://github.com/dmlc/decord
+
+# Install libnvcuvid.so
+sudo cp /path/libnvcuvid.so /usr/lib/aarch64-linux-gnu
+sudo cp /path/libnvidia-encode.so /usr/lib/aarch64-linux-gnu
+sudo ln -s /usr/lib/aarch64-linux-gnu/libnvcuvid.so /usr/local/cuda-11.4/lib64
+sudo ln -s /usr/lib/aarch64-linux-gnu/libnvidia-encode.so /usr/local/cuda-11.4/lib64
+
+# In decord folder
+cd decord
+mkdir build && cd build
+cmake .. -DUSE_CUDA=ON -DCMAKE_BUILD_TYPE=Release
+make -j5
+
+# Python Bindings
+cd ../python
+## option 1: add python path to $PYTHONPATH, you will need to install numpy separately
+pwd=$PWD
+echo "PYTHONPATH=$PYTHONPATH:$pwd" >> ~/.bashrc
+source ~/.bashrc
+## option 2: install with setuptools
+python3 setup.py install --user

@@ -1,0 +1,6 @@
+To add the repository to your installation, run the kitware-archive.sh 
+
+sudo apt update
+sudo apt install cmake
+or
+sudo apt install cmake=3.27.0-0kitware1ubuntu20.04.1
