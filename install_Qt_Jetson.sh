@@ -1,32 +1,13 @@
 #!/bin/bash
 #
-# Copyright (c) 2022, NVIDIA CORPORATION.  All rights reserved.
-#
-# NVIDIA Corporation and its licensors retain all intellectual property
-# and proprietary rights in and to this software, related documentation
-# and any modifications thereto.  Any use, reproduction, disclosure or
-# distribution of this software and related documentation without an express
-# license agreement from NVIDIA Corporation is strictly prohibited.
-#
-# Modified: t4her 20251126
+# Author: t4her
+# Brief: Build Qt from source. You should have Qt Creator v14.0.2 installed on jetson then use Qt as kit.
+# Date: 20251126
+# Last modified: 20251129
 
 version="5.15.12"
 folder="Qt"
 installpath=~/Qt/${version}
-
-for (( ; ; ))
-do
-    echo "Do you want to remove the default OpenCV (yes/no)?"
-    read rm_old
-
-    if [ "$rm_old" = "yes" ]; then
-        echo "** Remove other OpenCV first"
-        sudo apt -y purge *libopencv*
-	break
-    elif [ "$rm_old" = "no" ]; then
-	break
-    fi
-done
 
 
 echo "------------------------------------"
@@ -53,7 +34,7 @@ sudo apt install -y \
 echo "------------------------------------"
 echo "**   Download Qt "${version}"  (2/4)"
 echo "------------------------------------"
-tar -xzf qt-everywhere-opensource-src-${version}.tar.xz
+#tar -xzf qt-everywhere-opensource-src-${version}.tar.xz
 cd qt-everywhere-src-${version}/
 
 
@@ -63,7 +44,7 @@ echo "------------------------------------"
 mkdir build
 cd build/
 export LLVM_INSTALL_DIR=/usr/lib/llvm-9
-../configure  -prefix ${installpath} -release -opensource -confirm-license -platform linux-g++ -qt-zlib -qt-libpng -qt-webp -qt-libjpeg -feature-fontconfig -fontconfig -system-freetype -opengl desktop -feature-vulkan -gstreamer 1.0 -skip qt3d -skip qtdatavis3d -skip qtlottie -skip qtmacextras -skip qtnetworkauth -skip qtpurchasing -skip qtremoteobjects -skip qtscript -skip qtspeech -skip qtvirtualkeyboard -skip qtandroidextras -skip qtsensors -skip qtwayland -skip qtwebengine -skip webchannel -skip webengine -skip qtwebglplugin -skip qtwebchannel -skip qtwebview -make libs -make tools -nomake examples -nomake tests -doc
+../configure  -prefix ${installpath} -release -opensource -confirm-license -platform linux-g++ -doc -qt-zlib -qt-libpng -qt-webp -qt-libjpeg -feature-fontconfig -fontconfig -system-freetype -opengl desktop -feature-vulkan -gstreamer 1.0 -skip qt3d -skip qtdatavis3d -skip qtlottie -skip qtmacextras -skip qtnetworkauth -skip qtpurchasing -skip qtremoteobjects -skip qtscript -skip qtspeech -skip qtvirtualkeyboard -skip qtandroidextras -skip qtsensors -skip qtwayland -skip qtwebengine -skip webchannel -skip webengine -skip qtwebglplugin -skip qtwebchannel -skip qtwebview -make libs -make tools -nomake examples -nomake tests
 
 make -j$(nproc)
 
@@ -74,8 +55,9 @@ echo "------------------------------------"
 sudo make install
 sudo ldconfig
 echo 'export PATH='${instalpath}'/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH='${instalpath}'/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
 source ~/.bashrc
 
 
-echo "** Install opencv "${version}" successfully"
+echo "** Install Qt"${version}" successfully"
 echo "** Bye :)"
