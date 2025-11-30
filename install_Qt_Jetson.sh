@@ -1,12 +1,11 @@
 #!/bin/bash
 #
 # Author: t4her
-# Brief: Build Qt from source. You should have Qt Creator v14.0.2 installed on jetson then use Qt as kit.
+# Brief: Build Qt from source. You should have Qt Creator v14.0.2 (higher versions dont run because of gcc version on jetsons) installed on jetson then use Qt as kit.
 # Date: 20251126
-# Last modified: 20251129
+# Last modified: 20251130
 
 version="5.15.12"
-folder="Qt"
 installpath=~/Qt/${version}
 
 
@@ -15,7 +14,7 @@ echo "** Install requirement (1/4)"
 echo "------------------------------------"
 sudo apt-get update
 sudo apt install -y \
-	build-essential perl git python3 pkg-config cmake-qt-gui ninja-build qtbase5-dev \
+	build-essential perl git python3 pkg-config ninja-build qtbase5-dev \
 	llvm llvm-dev clang libclang-dev clazy \
 	libssl-dev \
 	libxext-dev libxfixes-dev libxi-dev libxrender-dev libxrandr-dev libxcursor-dev libxinerama-dev libxkb* libx11* libxcb* \
@@ -43,10 +42,11 @@ echo "**    Build Qt "${version}"    (3/4)"
 echo "------------------------------------"
 mkdir build
 cd build/
-export LLVM_INSTALL_DIR=/usr/lib/llvm-9
-../configure  -prefix ${installpath} -release -opensource -confirm-license -platform linux-g++ -doc -qt-zlib -qt-libpng -qt-webp -qt-libjpeg -feature-fontconfig -fontconfig -system-freetype -opengl desktop -feature-vulkan -gstreamer 1.0 -skip qt3d -skip qtdatavis3d -skip qtlottie -skip qtmacextras -skip qtnetworkauth -skip qtpurchasing -skip qtremoteobjects -skip qtscript -skip qtspeech -skip qtvirtualkeyboard -skip qtandroidextras -skip qtsensors -skip qtwayland -skip qtwebengine -skip webchannel -skip webengine -skip qtwebglplugin -skip qtwebchannel -skip qtwebview -make libs -make tools -nomake examples -nomake tests
+export LLVM_INSTALL_DIR=$(llvm-config --prefix)
+../configure  -prefix ${installpath} -release -opensource -confirm-license -platform linux-aarch64-gnu-g++ -qt-zlib -qt-libpng -qt-webp -qt-libjpeg -fontconfig -system-freetype -opengl es2 -opengles3 -eglfs -qpa xcb -gui -widgets -feature-vulkan -gstreamer 1.0 -skip qt3d -skip qtdatavis3d -skip qtlottie -skip qtwinextras -skip qtmacextras -skip qtandroidextras -skip qtgamepad -skip qtnetworkauth -skip qtpurchasing -skip qtremoteobjects -skip qtscript -skip qtspeech -skip qtvirtualkeyboard -skip qtsensors -skip qtwayland -skip qtwebengine -skip qtwebglplugin -skip qtwebchannel -skip qtwebview -make libs -make tools -make docs -nomake examples -nomake tests
 
-make -j$(nproc)
+#make -j$(nproc) not used because jetson hangs
+make -j6
 
 
 echo "------------------------------------"
@@ -54,8 +54,8 @@ echo "**  Install Qt "${version}"    (4/4)"
 echo "------------------------------------"
 sudo make install
 sudo ldconfig
-echo 'export PATH='${instalpath}'/bin:$PATH' >> ~/.bashrc
-echo 'export LD_LIBRARY_PATH='${instalpath}'/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
+echo 'export PATH='${installpath}'/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH='${installpath}'/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
 source ~/.bashrc
 
 
